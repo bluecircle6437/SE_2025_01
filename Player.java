@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-//Player는 name, Piece는 Id로 구별
+//Player는 name, Piece는 Num로 구별
 public class Player {
     private int name;
     private int order; // 턴 순서
@@ -17,8 +17,8 @@ public class Player {
     }
 
     public void addPiece() {
-        int pieceId = pieces.size();
-        pieces.add(new Piece(pieceId));
+        int pieceNum = pieces.size();
+        pieces.add(new Piece(pieceNum));
     }
 
     // Getter & Setter
@@ -29,7 +29,7 @@ public class Player {
     public int getArrivedCount() { return arrivedCount; }
     public void setArrivedCount(int count) { this.arrivedCount = count; }
 
-    public boolean allPiecesArrived() {
+    public boolean isGoal() {
         return arrivedCount == pieces.size();
     }
 }
