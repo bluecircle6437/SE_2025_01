@@ -1,7 +1,13 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Game {
     //현재 이 클래스의 대부분의 함수는 선언만 되어 있습니다. 프로젝트 완료 후 이 주석을 지워주세요
 
     //게임 전 설정
+    MapSpace map;//맵
+    List<Player> players = new ArrayList<Player>();//플레이어 리스트
+    List<Player> finishPlayers = new ArrayList<Player>();//순위 리스트(players와 동일 사이즈, 시작할 땐 비어 있음)
 
     //말 수 설정(2~5개)
     void setMaxPieceCount(int count) {
@@ -14,8 +20,8 @@ public class Game {
     }
 
     //판 선택(사각형, 오각형, 육각형)
-    void setMapSpace() {
-        //MapSpace 담당자분이 매개변수를 정해주세요
+    void setMapSpace(int type) {
+        map = new MapSpace(type);
     }
 
     //게임 중
@@ -54,5 +60,12 @@ public class Game {
     void checkFinished() {
         //각 플레이어 턴 종료 시 마다 체크
         //모든 말이 골인 시 플레이어 완료 처리 후 순위 갱신
+        for (int i = 0; i < players.size(); i++) {
+            if (players.get(i).isGoal()) {
+                finishPlayers.add(players.get(i)); //이 리스트에 들어온 순서대로 순위 결정
+                //완료된 플레이어는 players에서 빠지는데, 이후 구현에 문제 있으면 아래 부분을 주석 처리해주세요
+                players.remove(i);
+            }
+        }
     }
 }
