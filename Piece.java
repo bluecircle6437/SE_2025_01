@@ -1,53 +1,109 @@
 public class Piece {
-    public static int maxNum; //최대 식별 번호
-    private int pieceNum; //식별 번호
-    private int location; //위치
-    protected Player pPlayer; //소속 플레이어
-    private boolean isGoal; //골인 여부
+    public int pieceNum;      // 식별 번호 (외부에서 지정)
+    private int location;     // 위치
+    protected Player pPlayer; // 소속 플레이어
+    private boolean isGoal;   // 골인 여부
 
-    public Piece(Player p) {
-        pPlayer = p;
-        maxNum++;
-        pieceNum = maxNum;
-        location = -1; //배치되지 않은 상태
+    public Piece(int pieceNum) {
+        this.pieceNum = pieceNum;
+        location = -1; // 배치되지 않은 상태
         isGoal = false;
     }
 
-    //이하 게임 클래스에서 실행할 메소드들
-    //말 배치
+    // 말 배치
     public void isStarted() {
         location = 0;
+        System.out.println("말 " + pieceNum + "이 시작 위치에 배치되었습니다.");
     }
 
-    //말 이동
+    // 말 이동
     public void move(int target) {
         location = target;
+        System.out.println("말 " + pieceNum + "이 " + target + "칸으로 이동했습니다.");
     }
 
-    //말 잡힘
+    // 말 잡힘
     public void isCatched() {
         location = -1;
+        System.out.println("말 " + pieceNum + "이 잡혔습니다!");
     }
 
-    //말 완주
+    // 말 완주
     public void finished() {
         location = -1;
         isGoal = true;
+        System.out.println("말 " + pieceNum + "이 골인했습니다!");
     }
 
-    //이하 변수 정보 가져오는 메소드
-    public int getPieceNum() {
-        int num = pieceNum;
-        return num;
+    // 윷 던지기 (0 ~ 4)
+    public int throwYut() {
+        int flat = 0;
+        for (int i = 0; i < 4; i++) {
+            boolean isFlat = Math.random() < 0.5;
+            if (!isFlat) {
+                flat++;
+            }
+        }
+        return flat;
     }
 
+    // 윷 결과로 이동
+    public void moveByThrow() {
+        int result = throwYut();
+
+        int steps;
+        String name;
+
+        switch (result) {
+            case 0:
+                steps = 5;
+                name = "모 (Mo)";
+                break;
+            case 1:
+                steps = 1;
+                name = "도 (Do)";
+                break;
+            case 2:
+                steps = 2;
+                name = "개 (Gae)";
+                break;
+            case 3:
+                steps = 3;
+                name = "걸 (Geol)";
+                break;
+            case 4:
+                steps = 4;
+                name = "윷 (Yut)";
+                break;
+            default:
+                steps = 0;
+                name = "오류";
+        }
+
+        if (location == -1) {
+            System.out.println("말 " + pieceNum + "은(는) 아직 배치되지 않았습니다.");
+            return;
+        }
+
+        location += steps;
+        System.out.println("말 " + pieceNum + "이 " + name + "로 " + steps + "칸 이동했습니다. 현재 위치: " + location);
+
+        if (location >= 20) {
+            finished();
+        }
+
+        if (result == 0 || result == 4) {
+            System.out.println(name + "이 나와서 말 " + pieceNum + "이 한번 더 던집니다!");
+            moveByThrow();
+        }
+    }
+
+    // 변수 정보 반환
     public int getLocation() {
-        int num = location;
-        return num;
+        return location;
     }
 
     public boolean getIsGoal() {
-        boolean bool = isGoal;
-        return bool;
+        return isGoal;
     }
 }
