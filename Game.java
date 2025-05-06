@@ -16,7 +16,22 @@ public class Game {
 
     //플레이어 수 설정(2~4인)
     void setPlayerNumber(int number) {
+        
+if (number < 2 || number > 4) {
+            throw new IllegalArgumentException("플레이어 수는 2~4명 사이여야 합니다.");
+        }
 
+        players.clear();
+
+        for (int i = 0; i < number; i++) {
+            Player player = new Player(i, i);  // id와 순서를 같게
+            for (int j = 0; j < 4; j++) {
+                player.addPiece();
+            }
+            players.add(player);
+        }
+
+        currentPlayerIndex = 0;
     }
 
     //판 선택(사각형, 오각형, 육각형)
