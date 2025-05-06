@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Game {
     //현재 이 클래스의 대부분의 함수는 선언만 되어 있습니다. 프로젝트 완료 후 이 주석을 지워주세요
@@ -8,16 +9,18 @@ public class Game {
     MapSpace map;//맵
     List<Player> players = new ArrayList<Player>();//플레이어 리스트
     List<Player> finishPlayers = new ArrayList<Player>();//순위 리스트(players와 동일 사이즈, 시작할 땐 비어 있음)
+    int maxPieceCount;
+    int currentPlayerIndex;
 
     //말 수 설정(2~5개)
     void setMaxPieceCount(int count) {
-
+        maxPieceCount = count;
     }
 
     //플레이어 수 설정(2~4인)
     void setPlayerNumber(int number) {
         
-if (number < 2 || number > 4) {
+        if (number < 2 || number > 4) {
             throw new IllegalArgumentException("플레이어 수는 2~4명 사이여야 합니다.");
         }
 
@@ -25,7 +28,7 @@ if (number < 2 || number > 4) {
 
         for (int i = 0; i < number; i++) {
             Player player = new Player(i, i);  // id와 순서를 같게
-            for (int j = 0; j < 4; j++) {
+            for (int j = 0; j < maxPieceCount; j++) { //말 수 설정만큼 말 넣기
                 player.addPiece();
             }
             players.add(player);
@@ -40,8 +43,37 @@ if (number < 2 || number > 4) {
     }
 
     //게임 중
+    //게임 시작 시 이 함수 호출하시면 루프가 돌아갑니다
+    void makeTurn() {
+        while (!players.isEmpty()) {
+            setPlayerTurn(players.get(currentPlayerIndex), throwYut());
+            checkFinished();
+        }
+        //끝나면 finishPlayers에 전체 순위가 남습니다
+    }
 
     //윷 던지기
+    List<Integer> throwYut() {
+        List<Integer> result = new ArrayList<>();
+        Scanner scanner = new Scanner(System.in);
+        int num = 0;
+        while(num == 0 || num >= 4) {
+            if (num >= 4) {
+                String name = num == 4 ? "윷" : "모";
+                System.out.println(name + "이 나와서 플레이어 " + currentPlayerIndex + "번이 한번 더 던집니다!");
+            }
+            int next = scanner.nextInt();
+            if (next == 0) {
+                int select = scanner.nextInt();
+                num = throwYutSelect(select);
+            }
+            else num = throwYutRandom();
+            result.add(num);
+        }
+        scanner.close();
+        return result;
+    }
+
     int throwYutRandom() {
         //1~100 랜덤값을 구해 각 구간별로 계산
         double randomValue = (Math.random() * 100);
@@ -61,69 +93,97 @@ if (number < 2 || number > 4) {
     }
 
     //플레이어 행동권 지정
-    void setPlayerTurn(Player p) {
-    //대부분이 piece 클래스에 구현되어 있습니다
-    //윷 결과 중 선택 함수
-    public void useTurn(Player player, List<Integer> resultQueue) {
-    Scanner scanner = new Scanner(System.in);
+    void setPlayerTurn(Player player, List<Integer> resultQueue) {
+        //대부분이 piece 클래스에 구현되어 있습니다
+        //윷 결과 중 선택 함수
+        Scanner scanner = new Scanner(System.in);
 
-    while (!resultQueue.isEmpty()) {
-        System.out.println("남은 이동 결과: " + resultQueue);
-        
-        // 이동시킬 말 선택
-        System.out.print("이동할 말의 ID를 선택하세요: ");
-        int pieceNum = scanner.nextInt();
+        while (!resultQueue.isEmpty()) {
+            System.out.println("남은 이동 결과: " + resultQueue);
 
-        Piece piece = null;
-        for (Piece p : player.getPieces()) {
-            if (p.getNum() == pieceNum && !p.isFinished()) {
-                piece = p;
-                break;
+            // 이동시킬 말 선택
+            System.out.print("이동할 말의 ID를 선택하세요: ");
+            int pieceNum = scanner.nextInt();
+
+            Piece piece = null;
+            for (Piece p : player.getPieces()) {
+                if (p.getPieceNum() == pieceNum && !p.getIsGoal()) {
+                    piece = p;
+                    break;
+                }
+            }
+
+            //말이 골인한 말인지 확인 추가
+            if (piece == null || piece.getIsGoal()) {
+                System.out.println("유효하지 않은 말입니다.");
+                continue;
+            }
+
+            // 이동값 선택
+            System.out.println("사용할 이동 거리 선택:");
+            for (int i = 0; i < resultQueue.size(); i++) {
+                System.out.println(i + ": " + resultQueue.get(i) + "칸");
+            }
+
+            System.out.print("선택할 번호 입력: ");
+            int idx = scanner.nextInt();
+
+            if (idx < 0 || idx >= resultQueue.size()) {
+                System.out.println("잘못된 선택입니다.");
+                continue;
+            }
+
+            int move = resultQueue.remove(idx);
+            int newPos;
+
+            // 이동 처리
+            if (piece.getLocation() == -1) {//배치 시 특수 처리
+                piece.move(move);
+                newPos = move;
+            }
+            else {
+                newPos = map.getDestination(piece.getLocation(), move);
+                List<Piece> piecesList = player.getPiecesList(piece.getLocation()); //같은 칸에 말이 있는지 확인
+                if (piecesList != null) {
+                    for (Piece p : piecesList) {//업기 추가 구현
+                        if (newPos == -1) {
+                            p.move(-1);
+                            p.finished();
+                            player.setArrivedCount(player.getArrivedCount() + 1);
+                            System.out.println("말이 도착했습니다!");
+                        } else {
+                            p.move(newPos);
+                            System.out.println("말이 " + newPos + "칸으로 이동했습니다.");
+                        }
+                    }
+                }
+                
+            }
+            // 이후에 잡기 체크 및 추가 결과 반영
+            if (checkCatched(newPos)) {
+                System.out.println("말을 잡아 플레이어 " + currentPlayerIndex + "번이 한번 더 던집니다!");
+                resultQueue.addAll(throwYut());
             }
         }
 
-        if (piece == null) {
-            System.out.println("유효하지 않은 말입니다.");
-            continue;
-        }
-
-        // 이동값 선택
-        System.out.println("사용할 이동 거리 선택:");
-        for (int i = 0; i < resultQueue.size(); i++) {
-            System.out.println(i + ": " + resultQueue.get(i) + "칸");
-        }
-        System.out.print("선택할 번호 입력: ");
-        int idx = scanner.nextInt();
-        if (idx < 0 || idx >= resultQueue.size()) {
-            System.out.println("잘못된 선택입니다.");
-            continue;
-        }
-
-        int move = resultQueue.remove(idx);
-
-        // 이동 처리
-        int newPos = piece.getPosition() + move;
-        if (newPos >= 20) {
-            piece.setPosition(20);
-            piece.setFinished(true);
-            player.setArrivedCount(player.getArrivedCount() + 1);
-            System.out.println("말이 도착했습니다!");
-        } else {
-            piece.setPosition(newPos);
-            System.out.println("말이 " + newPos + "칸으로 이동했습니다.");
-        }
-
-        // 이후에 잡기 체크 및 추가 결과 반영
-    }
-
-    System.out.println("턴 종료");
-}
+        System.out.println("턴 종료");
+        scanner.close();
     }
 
     //말 잡기 구현
-    void checkCatched() {
-        //각 플레이어 턴 종료 시 마다 체크
-        //겹치는 말이 있으면 현재 턴 진행중인 플레이어의 말을 남기고 추가 기회 부여
+    boolean checkCatched(int location) {
+        for (int i = 0; i < players.size(); i++) {
+            if (i == currentPlayerIndex) continue;
+            Player player = players.get(i);
+            List<Piece> pList = player.getPiecesList(location);
+            if (pList != null) {
+                for (Piece p : pList) {
+                    p.isCatched();
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     //승리 조건 체크

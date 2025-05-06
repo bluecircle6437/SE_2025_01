@@ -36,6 +36,7 @@ public class Piece {
     }
 
     // 윷 던지기 (0 ~ 4)
+    //Game.throwYut으로 대체됨
     public int throwYut() {
         int flat = 0;
         for (int i = 0; i < 4; i++) {
@@ -48,6 +49,7 @@ public class Piece {
     }
 
     // 윷 결과로 이동
+    //MapSpace.getDestination으로 대체됨
     public void moveByThrow() {
         int result = throwYut();
 
@@ -99,6 +101,10 @@ public class Piece {
     }
 
     // 변수 정보 반환
+    public int getPieceNum() {
+        return pieceNum;
+    }
+
     public int getLocation() {
         return location;
     }
