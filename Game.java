@@ -62,7 +62,7 @@ if (number < 2 || number > 4) {
 
     //플레이어 행동권 지정
     void setPlayerTurn(Player p) {
-        //말 선택 및 이동 등 구현
+    //대부분이 piece 클래스에 구현되어 있습니다   
     }
 
     //말 잡기 구현
