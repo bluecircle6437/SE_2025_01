@@ -85,6 +85,17 @@ public class Game {
         checkZeroBack();
     }
 
+    //플레이어 교체 함수
+    void changePlayer() {
+        //무한루프 방지용으로 루프 수를 제한했습니다. 실제로 다 돌아갈 일은 없습니다
+        for (int i = 0; i < players.size(); i++) {
+            if (currentPlayerIndex + 1 == players.size()) currentPlayerIndex = 0;
+            else currentPlayerIndex++;
+            Player player = players.get(currentPlayerIndex);
+            if (!player.isGoal()) break;
+        }
+    }
+
     //윶 지정(테스트용)
     void throwYutSelect(int result) {
         if (result >= 4) {
@@ -103,14 +114,14 @@ public class Game {
         }
         System.out.println("판에 있는 플레이어 " + currentPlayerIndex + "번의 말이 없습니다. 차례를 건너뜁니다.");
         resultQueue.remove(0);
-        if (currentPlayerIndex + 1 == players.size()) currentPlayerIndex = 0;
-        else currentPlayerIndex++;
+        changePlayer();
     }
     
     //makeTurn, setPlayerTurn 메소드는 말 이동마다 호출하는 걸 상정해 루프가 제거되었습니다
     //이동시킬 말과 이동값 인덱스를 넣으면 됩니다
     void makeTurn(int pieceNum, int idx) {
-        if (!players.isEmpty()) {
+        //게임 종료 검사 코드 필요없으시면 지우셔도 됩니다
+        if (players.size() > finishPlayers.size()) {
             setPlayerTurn(pieceNum, idx);
             checkFinished();
             if (catchCount >= 1) {
@@ -119,8 +130,7 @@ public class Game {
             }
             else {
                 System.out.println("턴 종료");
-                if (currentPlayerIndex + 1 == players.size()) currentPlayerIndex = 0;
-                else currentPlayerIndex++;
+                changePlayer();
             }
         }
     }
@@ -198,6 +208,7 @@ public class Game {
         for (int i = 0; i < players.size(); i++) {
             if (i == currentPlayerIndex) continue;
             Player player = players.get(i);
+            if (player.isGoal()) continue;
             List<Piece> pList = player.getPiecesList(location);
             if (pList != null) {
                 for (Piece p : pList) {
@@ -215,7 +226,7 @@ public class Game {
         if (players.get(currentPlayerIndex).isGoal()) {
             finishPlayers.add(players.get(currentPlayerIndex)); //이 리스트에 들어온 순서대로 순위 결정
             //완료된 플레이어는 players에서 빠지는데, 이후 구현에 문제 있으면 아래 부분을 주석 처리해주세요
-            players.remove(currentPlayerIndex);
+            //players.remove(currentPlayerIndex);
             catchCount = 0;
         }
     }
