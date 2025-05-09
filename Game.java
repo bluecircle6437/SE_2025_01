@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Game {
-    //윷을 던질 때 throwYut 메소드들, 이동 칸 수와 말을 정한 후 makeTurn 메소드를 리턴하시면 됩니다
+    //윷을 던질 때 throwYut 메소드들, 이동 칸 수와 말을 정한 후 makeTurn 메소드를 호출하시면 됩니다
     //UI 구현에 필요한 정보 전달 함수는 아래쪽에 모아두었습니다
 
     //게임 전 설정
@@ -82,6 +82,7 @@ public class Game {
             System.out.println(name + "이 나와서 플레이어 " + currentPlayerIndex + "번이 한번 더 던집니다!");
         }
         resultQueue.add(result);
+        checkZeroBack();
     }
 
     //윶 지정(테스트용)
@@ -91,6 +92,19 @@ public class Game {
             System.out.println(name + "이 나와서 플레이어 " + currentPlayerIndex + "번이 한번 더 던집니다!");
         }
         resultQueue.add(result);
+        checkZeroBack();
+    }
+
+    //나간 말이 없는데 빽도면 턴 넘기기
+    void checkZeroBack() {
+        if (resultQueue.indexOf(-1) == -1 || resultQueue.size() > 1) return;
+        for (Piece p : players.get(currentPlayerIndex).getPieces()) {
+            if (p.getPieceNum() != -1) return;
+        }
+        System.out.println("판에 있는 플레이어 " + currentPlayerIndex + "번의 말이 없습니다. 차례를 건너뜁니다.");
+        resultQueue.remove(0);
+        if (currentPlayerIndex + 1 == players.size()) currentPlayerIndex = 0;
+        else currentPlayerIndex++;
     }
     
     //makeTurn, setPlayerTurn 메소드는 말 이동마다 호출하는 걸 상정해 루프가 제거되었습니다
@@ -209,6 +223,16 @@ public class Game {
     //UI 구현용 함수
     int getLastResult() {
         return resultQueue.get(resultQueue.size() - 1);
+    }
+
+    boolean getIsMoreThrow() {
+        if (resultQueue.get(resultQueue.size() - 1) >= 4) return true;
+        else return false;
+    }
+
+    //이거 호출해서 리턴이 0이면 다음 턴으로 진행
+    int getResultCount() {
+        return resultQueue.size();
     }
 
     int getCurrentPlayerIndex() {
