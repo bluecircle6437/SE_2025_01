@@ -1,3 +1,5 @@
+package main;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -6,8 +8,8 @@ import java.util.List;
 public class Player {
     private int name;
     private int order; // 턴 순서
-    private List<Piece> pieces;
     private int arrivedCount;
+    List<Piece> pieces;
 
     public Player(int name, int order) {
         this.name = name;
@@ -22,7 +24,7 @@ public class Player {
     }
 
     // Getter & Setter
-    public int getname() { return name; }
+    public int getName() { return name; }
     public int getOrder() { return order; }
     public void setOrder(int order) { this.order = order; }
     public List<Piece> getPieces() { return pieces; }

@@ -1,4 +1,6 @@
-import java.util.Arrays;
+package main;
+
+import java.util.*;
 
 public class MapSpace {
     int length; //맵 전체 길이
@@ -7,15 +9,15 @@ public class MapSpace {
     int[] secondRoute; //맵 중앙점 지나칠 시 이후 루트
     int[][] innerRoute; //내부를 통하는 루트
 
-    public MapSpace(int type) {
+    public MapSpace(String type) {
         switch (type) {
-            case 4:
+            case "사각형":
                 setSquareMap();
                 break;
-            case 5:
+            case "오각형":
                 setPentagonMap();
                 break;
-            case 6:
+            case "육각형":
                 setHexagonMap();
                 break;
             default:
@@ -24,7 +26,7 @@ public class MapSpace {
         }
     }
 
-    //판 생성 내부 함수
+  //판 생성 내부 함수
     //번호 순서는 바깥 루트-중앙점에서 1, 2번째로 가까운 루트를 제외한 나머지 루트-중앙점-중앙점에서 2번째로 가까운 루트-가장 가까운 루트
     private void setSquareMap() {
         length = 29;
@@ -80,24 +82,24 @@ public class MapSpace {
                 else return centerRoute[toGo];
             }
             //5. center, second 이외 지점인지 검사
-            for(int i = 0; i < innerRoute.length && toGo != -1; i++) {
-                if (start >= innerRoute[i][1] && start < innerRoute[i+1][1]) {
-                    int index = Arrays.asList(innerRoute[i]).indexOf(start);
+            for(int i = 0; i < innerRoute.length; i++) {
+                if (start == innerRoute[i][1] || start == innerRoute[i][2]) {
+                    int index = start == innerRoute[i][1] ? 1 : 2;
                     if (toGo + index >= innerRoute[i].length) {
                         if (innerRoute[i][innerRoute[i].length - 1] == 0) return -1;
-                        else return innerRoute[i][innerRoute[i].length - 1] + toGo;
+                        else return innerRoute[i][innerRoute[i].length - 1] + toGo + index - 6;
                     }
                     else return innerRoute[i][toGo + index];
                 }
             }
             //6. center, second 검사
-            if (start >= secondRoute[1] && start < centerRoute[1]) {
-                int index = Arrays.asList(secondRoute).indexOf(start);
-                if (toGo + index >= secondRoute.length) return secondRoute[secondRoute.length - 1] + toGo;
+            if (start == secondRoute[1] || start == secondRoute[2]) {
+                int index = start == secondRoute[1] ? 1 : 2;
+                if (toGo + index >= secondRoute.length) return secondRoute[secondRoute.length - 1] + toGo + index - 3;
                 else return secondRoute[toGo + index];
             }
             else {
-                int index = Arrays.asList(centerRoute).indexOf(start);
+                int index = start == centerRoute[1] ? 1 : 2;
                 if (toGo + index >= centerRoute.length) return -1;
                 else return centerRoute[toGo + index];
             }
