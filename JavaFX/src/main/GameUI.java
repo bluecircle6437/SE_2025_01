@@ -630,12 +630,12 @@ public class GameUI extends Application {
 					int nextPlayer = game.getCurrentPlayerIndex();
 					showAlert("다음 턴", "플레이어 " + (nextPlayer + 1) + "번의 턴입니다.");
 				}
-				game.clearCatchCount();
+				//game.clearCatchCount();
 			} else {
 				setThrowButtonsEnabled(false);
 			}
 
-			game.clearCatchCount();
+			//game.clearCatchCount();
 
 		} else {
 			if (game.resultQueue.isEmpty()) {

@@ -330,13 +330,13 @@ public class GameUI extends JFrame {
 							JOptionPane.showMessageDialog(null, "플레이어 " + (nextPlayer + 1) + "번의 턴입니다.");
 						}
 
-						game.clearCatchCount();
+						//game.clearCatchCount();
 					} else {
 						setThrowButtonsEnabled(false); // 결과 큐 남아있으면 윷 못던지게
 					}
 
 					// ✅ 여기서 catchCount 감소 (1회 잡기만 인정)
-					game.clearCatchCount();
+					//game.clearCatchCount();
 
 				} else {
 					if (game.resultQueue.isEmpty()) {

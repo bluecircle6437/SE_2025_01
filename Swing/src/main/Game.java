@@ -141,6 +141,7 @@ public class Game {
 
 			if (catchCount >= 1) {
 				System.out.println("말을 잡아 플레이어 " + (currentPlayerIndex + 1) + "번이 한번 더 던집니다!");
+				catchCount--;
 			} else {
 				System.out.println("턴 종료");
 				changePlayer();
